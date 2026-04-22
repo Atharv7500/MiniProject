@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hacker Mode | Profile Extractor</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="glass-panel" style="border-top: 4px solid var(--accent-red);">
+      <h2 style="color: var(--accent-red);"><span class="code-font">[IDOR]</span> Data Object</h2>
+      
+      <% if(typeof error !== 'undefined' && error) { %>
+        <div style="background: rgba(239, 68, 68, 0.2); border: 1px solid var(--accent-red); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; color: #fca5a5;">
+          ❌ <%= error %>
+        </div>
+      <% } else { %>
+        <div class="user-info" style="border-left-color: var(--accent-red);">
+          <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">
+            <span style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Retrieved Metadata For</span>
+            <h3 style="margin: 0; color: white;"><%= user %></h3>
+          </div>
+          <p><strong>DB Index ID:</strong> <span class="code-font"><%= data.id %></span></p>
+          <p><strong>Internal Role:</strong> <span class="code-font"><%= data.role %></span></p>
+          <p><strong>Raw Password Dump:</strong> <span class="code-font" style="color: var(--accent-red);"><%= data.password %></span></p>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">*Notice how the system blindly trusted the query parameter `<span class="code-font" style="color:white;">?id=...</span>` rather than verifying who you actually are.*</p>
+      <% } %>
+
+      <div style="margin-top: 2rem;">
+        <a href="/hacker/dashboard" class="btn" style="width: auto;">← Return to Dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

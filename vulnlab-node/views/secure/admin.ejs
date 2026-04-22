@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Mode | ADMIN CONSOLE</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background-color: #022c22; background-image: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="glass-panel" style="border-color: var(--accent-green); box-shadow: 0 0 40px rgba(16, 185, 129, 0.2);">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="color: var(--accent-green); background: none; -webkit-text-fill-color: initial;">SECURE ADMIN CONSOLE</h1>
+        <p style="color: #6ee7b7;">Cryptographic Role Verification Passed.</p>
+        <span class="badge badge-green" style="font-size: 1rem;">AUTHORIZED PERSONNEL ONLY</span>
+      </div>
+
+      <h3>Global User Registry</h3>
+      <ul class="admin-list" style="border: 1px solid var(--accent-green);">
+        <li style="border-bottom: 1px solid rgba(16, 185, 129, 0.3); padding: 0.5rem 1rem; color: #6ee7b7; font-weight: bold;">
+          <span>USERNAME</span>
+          <span>SYSTEM ROLE</span>
+        </li>
+      <% for(let u in users) { %>
+        <li style="padding: 1rem;">
+          <span style="font-size: 1.1rem; color: white;"><%= u %></span>
+          <span class="code-font" style="color: var(--accent-green);"><%= users[u].role %></span>
+        </li>
+      <% } %>
+      </ul>
+
+      <div style="margin-top: 3rem; text-align: center;">
+        <a href="/secure/dashboard" class="btn" style="background: rgba(255,255,255,0.1);">Log out of Console</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

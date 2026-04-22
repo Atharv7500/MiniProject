@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Mode | Verified Profile</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="glass-panel" style="border-top: 4px solid var(--accent-green);">
+      <h2 style="color: var(--accent-green);"><span class="code-font">[SECURE]</span> Server Verified Request</h2>
+      
+      <% if(typeof error !== 'undefined' && error) { %>
+        <div style="background: rgba(239, 68, 68, 0.2); border: 1px solid var(--accent-red); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; color: #fca5a5;">
+          ❌ <%= error %>
+        </div>
+      <% } else { %>
+        <div class="user-info" style="border-left-color: var(--accent-green); background: rgba(16, 185, 129, 0.05);">
+          <div style="margin-bottom: 1rem; border-bottom: 1px solid rgba(16, 185, 129, 0.2); padding-bottom: 0.5rem;">
+            <span style="color: var(--accent-green); font-size: 0.8rem; text-transform: uppercase;">Authenticated Identity</span>
+            <h3 style="margin: 0; color: white;"><%= user %></h3>
+          </div>
+          <p><strong>Secure DB Index:</strong> <span class="code-font"><%= data.id %></span></p>
+          <p><strong>Verified Role:</strong> <span class="code-font"><%= data.role %></span></p>
+          <p><strong>Hidden Status:</strong> <span style="color: var(--accent-green);">✓ Password omitted securely</span></p>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--accent-green);">*Success: No query parameters were used! The server forcefully pulled ID <span class="code-font"><%= data.id %></span> out of your signed Token payload. IDOR is impossible here.*</p>
+      <% } %>
+
+      <div style="margin-top: 2rem;">
+        <a href="/secure/dashboard" class="btn btn-secure" style="width: auto;">← Return to Secured Environment</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

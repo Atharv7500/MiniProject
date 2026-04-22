@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Mode | Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav style="width: 100%; padding: 1rem 2rem; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--accent-green); position:fixed; top:0;">
+    <h3 style="margin: 0; color: var(--accent-green);">🟢 SecureOps Terminal</h3>
+    <div>
+      <span style="margin-right: 1rem; color: var(--text-muted);">Secure ID: <strong style="color:white;"><%= userId %></strong> (<%= username %>)</span>
+      <a href="/secure/logout" class="btn btn-secure" style="padding: 0.5rem 1rem; display: inline-block; width: auto;">Sign out</a>
+    </div>
+  </nav>
+
+  <div class="container" style="margin-top: 5rem;">
+    <% if(typeof error !== 'undefined' && error) { %>
+      <div style="background: rgba(239, 68, 68, 0.2); border: 1px solid var(--accent-red); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; color: #fca5a5;">
+        🛡️ <%= error %>
+      </div>
+    <% } %>
+
+    <div class="glass-panel" style="border-color: rgba(16, 185, 129, 0.3);">
+      <h2>Welcome <span class="code-font" style="color: var(--accent-green);"><%= username %></span></h2>
+      <div class="user-info" style="border-left-color: var(--accent-green);">
+        <p style="margin: 0; font-size: 1.1rem;">Verified JWT Role: 
+          <span class="badge badge-<%= role === 'admin' ? 'green' : 'yellow' %>" style="margin: 0; font-size: 1rem;"><%= role %></span>
+        </p>
+        <% if(role === 'user') { %>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--accent-green);">✓ Your role is cryptographically signed via JWT. Client-side tampering will invalidate the signature.</p>
+        <% } %>
+      </div>
+
+      <div class="modes-grid">
+        <div style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3);">
+          <h3 style="color: var(--accent-green);">🛡️ Secure Profile Access</h3>
+          <p>The system no longer trusts the URL query parameter. It uses your verified session ID.</p>
+          <ul class="links-list">
+            <li><a href="/secure/profile" style="color: var(--accent-green);">View My Profile</a></li>
+          </ul>
+        </div>
+        
+        <div style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3);">
+          <h3 style="color: var(--accent-green);">🔒 Protected Admin Panel</h3>
+          <p>Administrative functions are protected by server-side JWT payload verification.</p>
+          <ul class="links-list">
+            <li><a href="/secure/admin" style="color: var(--accent-green);">Attempt Admin Access</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div style="margin-top: 2rem; text-align: center;">
+        <a href="/" style="color: var(--text-muted); text-decoration: none;">← Exit Simulation</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

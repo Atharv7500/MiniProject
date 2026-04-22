@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hacker Mode | Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav style="width: 100%; padding: 1rem 2rem; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--accent-red); position:fixed; top:0;">
+    <h3 style="margin: 0; color: var(--accent-red);">🔴 HackSec Dashboard</h3>
+    <div>
+      <span style="margin-right: 1rem; color: var(--text-muted);">Logged in as: <strong style="color:white;"><%= username %></strong></span>
+      <a href="/hacker/logout" class="btn btn-hacker" style="padding: 0.5rem 1rem; display: inline-block; width: auto;">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container" style="margin-top: 5rem;">
+    <% if(typeof error !== 'undefined' && error) { %>
+      <div style="background: rgba(239, 68, 68, 0.2); border: 1px solid var(--accent-red); padding: 1rem; border-radius: 8px; margin-bottom: 2rem; color: #fca5a5;">
+        ⚠️ <%= error %>
+      </div>
+    <% } %>
+
+    <div class="glass-panel">
+      <h2>Welcome <span class="code-font" style="color: var(--accent-purple);"><%= username %></span></h2>
+      <div class="user-info" style="border-left-color: var(--accent-red);">
+        <p style="margin: 0; font-size: 1.1rem;">Assigned Role: 
+          <span class="badge badge-<%= role === 'admin' ? 'red' : 'yellow' %>" style="margin: 0; font-size: 1rem;"><%= role %></span>
+        </p>
+        <% if(role === 'user') { %>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">*Hint: The role is literally mapped to your browser cookies. You have the tools to change this.*</p>
+        <% } %>
+      </div>
+
+      <div class="modes-grid">
+        <div style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border);">
+          <h3>🔍 Data Extraction (IDOR)</h3>
+          <p>Access your profile details. Notice the parameter in the URL when you click.</p>
+          <ul class="links-list">
+            <li><a href="/hacker/profile?id=1">View Profile 1</a></li>
+            <li><a href="/hacker/profile?id=2">View Profile 2</a></li>
+          </ul>
+        </div>
+        
+        <div style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border);">
+          <h3>💥 Find admin panel 😏</h3>
+          <p>Rumor has it, administrative functions exist on an obscured endpoint ending in <span class="code-font">_4521</span>.</p>
+          <ul class="links-list">
+            <li><a href="/hacker/admin_4521">Attempt Admin Access</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

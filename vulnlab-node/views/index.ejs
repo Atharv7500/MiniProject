@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VulnLab Gamified: Access Control</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="glass-panel" style="text-align: center;">
+      <h1>VulnLab: Access Control</h1>
+      <p style="font-size: 1.1rem; color: #cbd5e1;">Welcome to the Gamified Web Security Lab. Choose your simulation phase.</p>
+
+      <div class="modes-grid">
+        <!-- Hacker Mode -->
+        <a href="/hacker/login" style="text-decoration: none;">
+          <div class="mode-card hacker">
+            <h2 style="color: var(--accent-red);">🔴 Phase 1:<br>Hacker Mode</h2>
+            <p>Attack the vulnerable infrastructure.</p>
+            <span class="badge badge-red">Goals</span>
+            <ul class="links-list" style="text-align: left; padding-left: 2rem; color: #fca5a5;">
+              <li>1. Login (user/123)</li>
+              <li>2. Escalate via Cookies</li>
+              <li>3. IDOR execution</li>
+              <li>4. Discover Secret Admin Panel</li>
+            </ul>
+          </div>
+        </a>
+
+        <!-- Secure Mode -->
+        <a href="/secure/login" style="text-decoration: none;">
+          <div class="mode-card secure">
+            <h2 style="color: var(--accent-green);">🟢 Phase 2:<br>Secure Mode</h2>
+            <p>Engage with the hardened defenses.</p>
+            <span class="badge badge-green">Goals</span>
+            <ul class="links-list" style="text-align: left; padding-left: 2rem; color: #6ee7b7;">
+              <li>1. Login via JWT</li>
+              <li>2. Blocked: Role tampering</li>
+              <li>3. Blocked: IDOR extraction</li>
+              <li>4. Cryptographic Server Verification</li>
+            </ul>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
