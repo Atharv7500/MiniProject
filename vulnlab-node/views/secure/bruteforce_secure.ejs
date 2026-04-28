@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mission 02 | Secure — Rate Limiting</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="top-nav" style="border-bottom-color: var(--accent-green);">
+    <h3 style="margin:0; color: var(--accent-green);">🟢 Mission 02 — Secure Mode</h3>
+    <a href="/" class="btn btn-outline btn-sm">← Hub</a>
+  </nav>
+
+  <div class="container" style="margin-top: 5rem;">
+    <div class="glass-panel" style="border-top: 4px solid var(--accent-green);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <div>
+          <span class="badge badge-green">SECURED</span>
+          <h2 style="color: var(--accent-green); margin-bottom:0.25rem;">Rate Limiting Active</h2>
+          <p style="margin:0; font-size:0.85rem;">Server enforces max 3 attempts then 30s lockout.</p>
+        </div>
+        <button id="launchBtn" class="btn btn-secure btn-sm" onclick="startAttack()" style="min-width:160px;">▶ Launch Attack</button>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-header">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="terminal-title">bruteforce_attack.py — targeting SECURED endpoint</span>
+        </div>
+        <div class="terminal-body" id="terminalOutput">
+          <div class="terminal-line info">[*] Brute Force Attack Script v2.1</div>
+          <div class="terminal-line info">[*] Target: http://localhost:3000/bruteforce/secure-attempt</div>
+          <div class="terminal-line info">[*] Username: admin</div>
+          <div class="terminal-line" style="color:#444;">───────────────────────────────────────</div>
+          <div class="terminal-line warning">[!] Press "Launch Attack" to begin...</div>
+        </div>
+      </div>
+
+      <div class="progress-bar-container" style="margin-top:1rem;">
+        <div class="progress-bar-fill" id="progressBar" style="background: linear-gradient(90deg, var(--accent-green), #059669);"></div>
+      </div>
+
+      <div id="lockoutPanel" style="display:none; margin-top:1.5rem;"></div>
+
+      <div class="comparison" style="margin-top:1.5rem;">
+        <div class="comparison-col vuln">
+          <h3 style="color:var(--accent-red); font-size:0.95rem;">❌ Without Rate Limiting</h3>
+          <ul style="list-style:none; font-size:0.85rem; color:#94a3b8;">
+            <li style="margin-bottom:0.5rem;">• Unlimited login attempts</li>
+            <li style="margin-bottom:0.5rem;">• Attacker tries thousands of passwords</li>
+            <li style="margin-bottom:0.5rem;">• Password eventually cracked</li>
+            <li>• No alerts or lockouts</li>
+          </ul>
+        </div>
+        <div class="comparison-col safe">
+          <h3 style="color:var(--accent-green); font-size:0.95rem;">✓ With Rate Limiting</h3>
+          <ul style="list-style:none; font-size:0.85rem; color:#94a3b8;">
+            <li style="margin-bottom:0.5rem;">• Max 3 attempts per window</li>
+            <li style="margin-bottom:0.5rem;">• 30-second lockout on exceed</li>
+            <li style="margin-bottom:0.5rem;">• Brute force becomes impractical</li>
+            <li>• Account protection + alerting</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const passwords = ['1234', 'password', 'letmein', 'qwerty', 'admin123', 'admin'];
+let attackRunning = false;
+
+async function startAttack() {
+  if (attackRunning) return;
+  attackRunning = true;
+  document.getElementById('launchBtn').disabled = true;
+  document.getElementById('launchBtn').textContent = '⏳ Running...';
+
+  const terminal = document.getElementById('terminalOutput');
+  addLine(terminal, '[*] Starting brute force against SECURED endpoint...', 'info');
+  addLine(terminal, '');
+
+  for (let i = 0; i < passwords.length; i++) {
+    const pw = passwords[i];
+    document.getElementById('progressBar').style.width = ((i+1)/passwords.length*100) + '%';
+
+    addLine(terminal, `<span class="prompt">[$]</span> Trying admin:${pw}...`, '');
+    await sleep(600);
+
+    try {
+      const res = await fetch('/bruteforce/secure-attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'admin', password: pw })
+      });
+      const data = await res.json();
+
+      if (data.blocked) {
+        addLine(terminal, `    🛡️ BLOCKED — ${data.message}`, 'error');
+        addLine(terminal, '');
+        addLine(terminal, '[!] ═══════════════════════════════════════', 'warning');
+        addLine(terminal, '[!]   ATTACK FAILED — Rate Limit Enforced', 'warning');
+        addLine(terminal, '[!] ═══════════════════════════════════════', 'warning');
+
+        document.getElementById('lockoutPanel').style.display = 'block';
+        document.getElementById('lockoutPanel').innerHTML = `
+          <div class="alert alert-success" style="text-align:center;">
+            <div style="font-size:2rem; margin-bottom:0.5rem;">🛡️</div>
+            <strong>Attack Blocked!</strong><br>
+            <span>Rate limiting prevented the brute force attack after just 3 attempts.</span><br>
+            <span class="code-font" style="font-size:0.85rem; color:var(--accent-green);">Lockout: 30 seconds</span>
+          </div>`;
+        break;
+      } else if (data.success) {
+        addLine(terminal, `[✓] SUCCESS: admin:${pw}`, 'success');
+        break;
+      } else {
+        addLine(terminal, `    ❌ Failed — ${data.message}`, 'error');
+      }
+    } catch(e) {
+      addLine(terminal, '    ⚠ Network error', 'warning');
+    }
+    await sleep(300);
+  }
+
+  document.getElementById('launchBtn').textContent = '✓ Complete';
+  attackRunning = false;
+}
+
+function addLine(el, html, cls) {
+  const div = document.createElement('div');
+  div.className = 'terminal-line' + (cls ? ' '+cls : '');
+  div.innerHTML = html;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>

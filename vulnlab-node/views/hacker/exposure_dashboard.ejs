@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mission 05 | Data Exposure</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="top-nav" style="border-bottom-color: var(--accent-amber);">
+    <h3 style="margin:0; color: var(--accent-amber);">🔴 Mission 05 — Sensitive Data Exposure</h3>
+    <a href="/" class="btn btn-outline btn-sm">← Hub</a>
+  </nav>
+
+  <div class="container wide" style="margin-top: 5rem;">
+    <div class="glass-panel" style="border-top: 4px solid var(--accent-amber);">
+      <span class="badge badge-amber">VULNERABLE</span>
+      <h2 style="color: var(--accent-amber);">🔍 TechCorp Employee Dashboard</h2>
+      <p>A normal-looking dashboard. But open the Network Inspector below to see what the API is really returning...</p>
+
+      <!-- Dashboard Content -->
+      <div class="modes-grid">
+        <div style="padding:1.5rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid var(--glass-border);">
+          <h3 style="font-size:1rem;">👥 Team Members</h3>
+          <p style="font-size:0.85rem;">View company employee roster.</p>
+          <button class="btn btn-amber btn-sm" onclick="fetchAPI('/dataexposure/api/users', 'users')">Load Users API</button>
+        </div>
+        <div style="padding:1.5rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid var(--glass-border);">
+          <h3 style="font-size:1rem;">⚙️ Server Config</h3>
+          <p style="font-size:0.85rem;">Internal system configuration.</p>
+          <button class="btn btn-amber btn-sm" onclick="fetchAPI('/dataexposure/api/config', 'config')">Load Config API</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Network Inspector Panel -->
+    <div class="inspector-panel" style="margin-top:0;">
+      <div class="inspector-tabs">
+        <button class="inspector-tab active">Network</button>
+        <button class="inspector-tab">Console</button>
+        <button class="inspector-tab">Sources</button>
+      </div>
+
+      <div class="inspector-requests" id="requestList">
+        <div style="padding:1rem; color:#444; text-align:center; font-size:0.8rem;">Click an API button above to capture network requests...</div>
+      </div>
+
+      <div style="border-top:1px solid #333;">
+        <div style="padding:0.5rem 1rem; background:#1a1a1a; color:#666; font-size:0.75rem;">Response Preview</div>
+        <div class="inspector-response" id="responsePreview">
+          <span style="color:#444;">Select a request to view response data...</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem; padding:1rem; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(245,158,11,0.2);">
+      <h3 style="color:var(--accent-amber); font-size:1rem; margin-bottom:0.75rem;">🧠 What's Happening</h3>
+      <p style="font-size:0.85rem; margin:0;">The API endpoints return <strong>sensitive data in plaintext</strong> — passwords, API keys, database credentials. In a real app, this data would be visible to anyone who opens browser DevTools or intercepts network traffic.</p>
+    </div>
+  </div>
+
+<script>
+const requests = [];
+
+async function fetchAPI(url, type) {
+  const start = performance.now();
+  const res = await fetch(url);
+  const data = await res.json();
+  const duration = Math.round(performance.now() - start);
+
+  requests.push({ method: 'GET', url, status: res.status, data, duration, type });
+  renderRequests();
+  showResponse(requests.length - 1);
+}
+
+function renderRequests() {
+  const list = document.getElementById('requestList');
+  list.innerHTML = requests.map((r, i) => `
+    <div class="inspector-req-item" onclick="showResponse(${i})">
+      <span class="method">${r.method}</span>
+      <span class="url">${r.url}</span>
+      <span style="color:#666; font-size:0.75rem;">${r.duration}ms</span>
+      <span class="status ${r.status === 200 ? 'ok' : 'error'}">${r.status}</span>
+    </div>
+  `).join('');
+}
+
+function showResponse(idx) {
+  const r = requests[idx];
+  const preview = document.getElementById('responsePreview');
+  const json = JSON.stringify(r.data, null, 2);
+
+  // Highlight dangerous fields
+  const highlighted = json
+    .replace(/"(password|ssn|salary|secret|api_keys|aws_secret|stripe|sendgrid|jwt_secret|db_admin|Pr0d_DB_P@ss!2024)"/g, '"<span class="json-danger">$1</span>"')
+    .replace(/: "([^"]*(?:123456|admin|sk_live|SG\.|AKIA|Pr0d)[^"]*)"/g, ': "<span class="json-danger">$1</span>"');
+
+  preview.innerHTML = highlighted;
+}
+</script>
+</body>
+</html>

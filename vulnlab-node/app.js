@@ -28,8 +28,8 @@ app.use("/secure", secureRoutes);
 
 // Shared Dummy DB for demonstration mapping
 app.locals.users = {
-  user: { password: "123", role: "user", id: 1 },
-  admin: { password: "admin", role: "admin", id: 2 }
+  user: { password: "123", role: "user", id: 1, email: "user@techcorp.com" },
+  admin: { password: "admin", role: "admin", id: 2, email: "admin@techcorp.com" }
 };
 
 app.listen(3000, () => {

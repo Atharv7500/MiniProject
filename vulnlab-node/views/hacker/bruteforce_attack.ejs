@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mission 02 | Brute Force Attack</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="top-nav" style="border-bottom-color: var(--accent-orange);">
+    <h3 style="margin:0; color: var(--accent-orange);">🔴 Mission 02 — Brute Force</h3>
+    <a href="/" class="btn btn-outline btn-sm">← Hub</a>
+  </nav>
+
+  <div class="container" style="margin-top: 5rem;">
+    <div class="glass-panel" style="border-top: 4px solid var(--accent-orange);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <div>
+          <span class="badge badge-orange">VULNERABLE</span>
+          <h2 style="color: var(--accent-orange); margin-bottom:0.25rem;">Rate Limiting Failure</h2>
+          <p style="margin:0; font-size:0.85rem;">No limit on login attempts — passwords can be cracked by brute force.</p>
+        </div>
+        <button id="launchBtn" class="btn btn-orange btn-sm" onclick="startAttack()" style="min-width:160px;">▶ Launch Attack</button>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-header">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="terminal-title">bruteforce_attack.py — targeting admin@localhost:3000</span>
+        </div>
+        <div class="terminal-body" id="terminalOutput">
+          <div class="terminal-line info">[*] Brute Force Attack Script v2.1</div>
+          <div class="terminal-line info">[*] Target: http://localhost:3000/bruteforce/attempt</div>
+          <div class="terminal-line info">[*] Username: admin</div>
+          <div class="terminal-line info">[*] Dictionary: common_passwords.txt (8 entries)</div>
+          <div class="terminal-line" style="color:#444;">───────────────────────────────────────</div>
+          <div class="terminal-line warning">[!] Press "Launch Attack" to begin...</div>
+        </div>
+      </div>
+
+      <div class="progress-bar-container" style="margin-top:1rem;">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+      <div id="progressText" style="text-align:center; font-size:0.8rem; color:#666;">0 / 8 passwords tried</div>
+
+      <div id="resultPanel" style="display:none; margin-top:1.5rem;"></div>
+
+      <div style="margin-top:2rem; padding:1rem; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(249,115,22,0.2);">
+        <h3 style="color:var(--accent-orange); font-size:1rem; margin-bottom:0.75rem;">🧠 Why This Works</h3>
+        <p style="font-size:0.85rem; margin:0;">The server has <strong>no rate limiting</strong> — it happily processes unlimited login attempts. A real attacker would use tools like <span class="code-font" style="color:white;">Hydra</span> or <span class="code-font" style="color:white;">Burp Suite Intruder</span> to try thousands of passwords per second.</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+const passwords = ['1234', 'password', 'letmein', 'qwerty', '123456', 'welcome', 'admin123', 'admin'];
+let attackRunning = false;
+
+async function startAttack() {
+  if (attackRunning) return;
+  attackRunning = true;
+  document.getElementById('launchBtn').disabled = true;
+  document.getElementById('launchBtn').textContent = '⏳ Running...';
+
+  const terminal = document.getElementById('terminalOutput');
+  const progressBar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+
+  addLine(terminal, '[*] Starting brute force attack...', 'info');
+  addLine(terminal, '');
+
+  for (let i = 0; i < passwords.length; i++) {
+    const pw = passwords[i];
+    const pct = ((i + 1) / passwords.length * 100);
+    progressBar.style.width = pct + '%';
+    progressText.textContent = `${i + 1} / ${passwords.length} passwords tried`;
+
+    addLine(terminal, `<span class="prompt">[$]</span> Trying admin:${pw}...`, '');
+    await sleep(800);
+
+    try {
+      const res = await fetch('/bruteforce/attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'admin', password: pw })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        addLine(terminal, `[✓] PASSWORD FOUND: admin:${pw}`, 'success');
+        addLine(terminal, '');
+        addLine(terminal, '[✓] ═══════════════════════════════════', 'success');
+        addLine(terminal, '[✓]   ACCESS GRANTED — Attack Complete', 'success');
+        addLine(terminal, '[✓] ═══════════════════════════════════', 'success');
+        progressBar.style.background = 'linear-gradient(90deg, #10b981, #059669)';
+
+        document.getElementById('resultPanel').style.display = 'block';
+        document.getElementById('resultPanel').innerHTML = `
+          <div class="alert alert-danger" style="text-align:center;">
+            <div style="font-size:2rem; margin-bottom:0.5rem;">🔓</div>
+            <strong>Password Cracked!</strong><br>
+            <span class="code-font">admin : ${pw}</span><br>
+            <span style="font-size:0.8rem; color:#94a3b8;">Cracked in ${i + 1} attempts with zero resistance.</span>
+          </div>`;
+        break;
+      } else {
+        addLine(terminal, `    ❌ Failed — "${pw}" is incorrect`, 'error');
+      }
+    } catch (e) {
+      addLine(terminal, `    ⚠ Network error`, 'warning');
+    }
+    await sleep(300);
+  }
+
+  document.getElementById('launchBtn').textContent = '✓ Complete';
+  attackRunning = false;
+}
+
+function addLine(el, html, cls) {
+  const div = document.createElement('div');
+  div.className = 'terminal-line' + (cls ? ' ' + cls : '');
+  div.innerHTML = html;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>

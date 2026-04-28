@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mission 03 | Fake Inbox</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="top-nav" style="border-bottom-color: var(--accent-cyan);">
+    <h3 style="margin:0; color: var(--accent-cyan);">📬 TechCorp Email — Inbox</h3>
+    <a href="/" class="btn btn-outline btn-sm">← Hub</a>
+  </nav>
+
+  <div class="container" style="margin-top: 5rem;">
+    <div class="email-client">
+      <div class="email-header">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span style="font-size:1.5rem;">📧</span>
+          <div>
+            <div style="font-weight:700; color:white;">TechCorp Mail</div>
+            <div style="font-size:0.75rem; color:#64748b;">Inbox (<%= emails.length %> messages)</div>
+          </div>
+        </div>
+        <span class="badge badge-cyan">SIMULATED</span>
+      </div>
+
+      <% if (emails.length === 0) { %>
+        <div style="padding:3rem; text-align:center; color:#64748b;">
+          <div style="font-size:3rem; margin-bottom:1rem;">📭</div>
+          <p>No emails yet. <a href="/resetexploit/forgot" style="color:var(--accent-cyan);">Request a password reset</a> first.</p>
+        </div>
+      <% } else { %>
+        <% emails.forEach(function(email, i) { %>
+          <div class="email-item unread">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <div class="email-from">📨 <%= email.from %></div>
+                <div class="email-subject"><strong><%= email.subject %></strong></div>
+              </div>
+              <span class="email-time"><%= email.time %></span>
+            </div>
+            <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #1f2937;">
+              <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:0.75rem;">
+                Hi, you requested a password reset. Click the link below:
+              </p>
+              <div class="email-link-vuln">
+                <a href="<%= email.link %>">http://localhost:3000<%= email.link %></a>
+              </div>
+              <p style="font-size:0.75rem; color:#ef4444; margin:0.5rem 0 0;">
+                ⚠️ Notice: No cryptographic token — just the username in plain text!
+              </p>
+            </div>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a href="/resetexploit/forgot" class="btn btn-cyan btn-sm" style="margin-right:0.5rem;">Request Another Reset</a>
+      <a href="/" class="btn btn-outline btn-sm">← Hub</a>
+    </div>
+  </div>
+</body>
+</html>

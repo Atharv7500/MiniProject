@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mission 04 | Secure Upload</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="top-nav" style="border-bottom-color: var(--accent-green);">
+    <h3 style="margin:0; color: var(--accent-green);">🟢 Mission 04 — Secure Upload</h3>
+    <a href="/" class="btn btn-outline btn-sm">← Hub</a>
+  </nav>
+
+  <div class="container" style="margin-top: 5rem;">
+    <div class="glass-panel" style="border-top: 4px solid var(--accent-green);">
+      <span class="badge badge-green">SECURED</span>
+      <h2 style="color: var(--accent-green);">📂 Secure Assignment Portal</h2>
+      <p>Only <span class="code-font" style="color:white;">.pdf, .docx, .jpg, .png</span> files accepted. Max 5MB. MIME type validated.</p>
+
+      <form method="POST" action="/fileupload/secure/upload" enctype="multipart/form-data">
+        <div class="upload-zone" onclick="document.getElementById('secFileInput').click()" style="border-color: rgba(16,185,129,0.3);">
+          <div class="upload-icon">🛡️</div>
+          <p style="color:white; font-weight:600;">Drop your file here or click to browse</p>
+          <p style="font-size:0.8rem;">Allowed: PDF, DOCX, JPG, PNG only</p>
+          <input type="file" name="file" id="secFileInput" style="display:none;" onchange="showName(this)">
+        </div>
+        <div id="fileName" style="margin-top:0.5rem; font-size:0.85rem; color:#94a3b8;"></div>
+        <button type="submit" class="btn btn-secure" style="margin-top:1rem;">📤 Upload Securely</button>
+      </form>
+
+      <% if (result) { %>
+        <div style="margin-top:1.5rem;">
+          <% if (result.blocked) { %>
+            <div class="alert alert-success" style="text-align:center;">
+              <div style="font-size:2rem; margin-bottom:0.5rem;">🛡️</div>
+              <strong>Upload Blocked!</strong><br>
+              <span class="code-font" style="font-size:0.85rem;"><%= result.error %></span>
+            </div>
+          <% } else if (result.error) { %>
+            <div class="alert alert-danger"><%= result.error %></div>
+          <% } else { %>
+            <div class="alert alert-success">
+              ✓ File accepted: <span class="code-font"><%= result.originalName %></span> (<%= result.size %>)
+              <br><span style="font-size:0.8rem;">Renamed to: <span class="code-font"><%= result.filename %></span></span>
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+
+      <div class="comparison" style="margin-top:1.5rem;">
+        <div class="comparison-col vuln">
+          <h3 style="color:var(--accent-red); font-size:0.95rem;">❌ Without Validation</h3>
+          <ul style="list-style:none; font-size:0.85rem; color:#94a3b8;">
+            <li style="margin-bottom:0.5rem;">• Accepts any file type</li>
+            <li style="margin-bottom:0.5rem;">• Keeps original filename</li>
+            <li style="margin-bottom:0.5rem;">• No size limits</li>
+            <li>• Serves files directly — code execution</li>
+          </ul>
+        </div>
+        <div class="comparison-col safe">
+          <h3 style="color:var(--accent-green); font-size:0.95rem;">✓ With Validation</h3>
+          <ul style="list-style:none; font-size:0.85rem; color:#94a3b8;">
+            <li style="margin-bottom:0.5rem;">• Whitelist allowed extensions</li>
+            <li style="margin-bottom:0.5rem;">• Check MIME type server-side</li>
+            <li style="margin-bottom:0.5rem;">• Rename files (no original names)</li>
+            <li>• 5MB size limit enforced</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+function showName(input) {
+  if (input.files.length > 0) {
+    document.getElementById('fileName').textContent = 'Selected: ' + input.files[0].name;
+  }
+}
+</script>
+</body>
+</html>

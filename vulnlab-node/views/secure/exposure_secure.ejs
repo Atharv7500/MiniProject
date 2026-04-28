@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mission 05 | Secure Data</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="top-nav" style="border-bottom-color: var(--accent-green);">
+    <h3 style="margin:0; color: var(--accent-green);">🟢 Mission 05 — Secure Mode</h3>
+    <a href="/" class="btn btn-outline btn-sm">← Hub</a>
+  </nav>
+
+  <div class="container wide" style="margin-top: 5rem;">
+    <div class="glass-panel" style="border-top: 4px solid var(--accent-green);">
+      <span class="badge badge-green">SECURED</span>
+      <h2 style="color: var(--accent-green);">🔍 Secured Employee Dashboard</h2>
+      <p>Same dashboard — but APIs now return sanitized, safe responses.</p>
+
+      <div class="modes-grid">
+        <div style="padding:1.5rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(16,185,129,0.3);">
+          <h3 style="font-size:1rem; color:var(--accent-green);">👥 Team Members</h3>
+          <p style="font-size:0.85rem;">Sanitized employee data — no sensitive fields.</p>
+          <button class="btn btn-secure btn-sm" onclick="fetchAPI('/dataexposure/secure/api/users')">Load Secure Users API</button>
+        </div>
+        <div style="padding:1.5rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(16,185,129,0.3);">
+          <h3 style="font-size:1rem; color:var(--accent-green);">⚙️ Server Config</h3>
+          <p style="font-size:0.85rem;">Config endpoint blocked entirely.</p>
+          <button class="btn btn-secure btn-sm" onclick="fetchAPI('/dataexposure/secure/api/config')">Attempt Config API</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Network Inspector -->
+    <div class="inspector-panel" style="margin-top:0;">
+      <div class="inspector-tabs">
+        <button class="inspector-tab active">Network</button>
+        <button class="inspector-tab">Console</button>
+      </div>
+      <div class="inspector-requests" id="requestList">
+        <div style="padding:1rem; color:#444; text-align:center; font-size:0.8rem;">Click an API button above...</div>
+      </div>
+      <div style="border-top:1px solid #333;">
+        <div style="padding:0.5rem 1rem; background:#1a1a1a; color:#666; font-size:0.75rem;">Response Preview</div>
+        <div class="inspector-response" id="responsePreview">
+          <span style="color:#444;">Select a request...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="comparison" style="margin-top:1.5rem;">
+      <div class="comparison-col vuln">
+        <h3 style="color:var(--accent-red); font-size:0.95rem;">❌ Vulnerable API Response</h3>
+        <pre class="code-font" style="font-size:0.75rem; color:#94a3b8; white-space:pre-wrap;">{ "username": "admin",
+  "password": "admin",   ← EXPOSED
+  "ssn": "412-55-9832",  ← EXPOSED
+  "salary": "$185,000"   ← EXPOSED
+}</pre>
+      </div>
+      <div class="comparison-col safe">
+        <h3 style="color:var(--accent-green); font-size:0.95rem;">✓ Secure API Response</h3>
+        <pre class="code-font" style="font-size:0.75rem; color:#94a3b8; white-space:pre-wrap;">{ "username": "admin",
+  "role": "admin",
+  "id": 2
+}
+// No passwords, SSN, or salary</pre>
+      </div>
+    </div>
+  </div>
+
+<script>
+const requests = [];
+async function fetchAPI(url) {
+  const start = performance.now();
+  const res = await fetch(url);
+  const data = await res.json();
+  const duration = Math.round(performance.now() - start);
+  requests.push({ method: 'GET', url, status: res.status, data, duration });
+  renderRequests();
+  showResponse(requests.length - 1);
+}
+
+function renderRequests() {
+  document.getElementById('requestList').innerHTML = requests.map((r, i) => `
+    <div class="inspector-req-item" onclick="showResponse(${i})">
+      <span class="method">${r.method}</span>
+      <span class="url">${r.url}</span>
+      <span style="color:#666; font-size:0.75rem;">${r.duration}ms</span>
+      <span class="status ${r.status === 200 ? 'ok' : 'error'}">${r.status}</span>
+    </div>
+  `).join('');
+}
+
+function showResponse(idx) {
+  const r = requests[idx];
+  document.getElementById('responsePreview').textContent = JSON.stringify(r.data, null, 2);
+}
+</script>
+</body>
+</html>

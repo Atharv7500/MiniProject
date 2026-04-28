@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mission 03 | Secure Inbox</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="top-nav" style="border-bottom-color: var(--accent-green);">
+    <h3 style="margin:0; color: var(--accent-green);">📬 Secure Mail — Token Inbox</h3>
+    <a href="/" class="btn btn-outline btn-sm">← Hub</a>
+  </nav>
+
+  <div class="container" style="margin-top: 5rem;">
+    <div class="email-client">
+      <div class="email-header">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span style="font-size:1.5rem;">🔒</span>
+          <div>
+            <div style="font-weight:700; color:white;">Secure Token Store</div>
+            <div style="font-size:0.75rem; color:#64748b;"><%= tokens.length %> tokens issued</div>
+          </div>
+        </div>
+        <span class="badge badge-green">SECURED</span>
+      </div>
+
+      <% if (tokens.length === 0) { %>
+        <div style="padding:3rem; text-align:center; color:#64748b;">
+          <p>No tokens issued. <a href="/resetexploit/secure/forgot" style="color:var(--accent-green);">Request a secure reset</a>.</p>
+        </div>
+      <% } else { %>
+        <% tokens.forEach(function(t) { %>
+          <div class="email-item" style="border-left: 3px solid var(--accent-green);">
+            <div style="display:flex; justify-content:space-between;">
+              <span class="email-from">User: <%= t.user %></span>
+              <span class="badge <%= t.used ? 'badge-red' : 'badge-green' %>" style="margin:0;"><%= t.used ? 'USED' : 'ACTIVE' %></span>
+            </div>
+            <div class="code-font" style="font-size:0.75rem; color:#64748b; margin-top:0.5rem; word-break:break-all;">Token: <%= t.token %></div>
+            <div style="font-size:0.75rem; color:#64748b; margin-top:0.25rem;">Expires: <%= new Date(t.expiry).toLocaleTimeString() %></div>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a href="/resetexploit/secure/forgot" class="btn btn-secure btn-sm">← Back to Reset</a>
+    </div>
+  </div>
+</body>
+</html>

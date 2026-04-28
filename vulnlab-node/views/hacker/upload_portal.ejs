@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mission 04 | Assignment Portal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="top-nav" style="border-bottom-color: var(--accent-purple);">
+    <h3 style="margin:0; color: var(--accent-purple);">🔴 Mission 04 — File Upload Exploit</h3>
+    <a href="/" class="btn btn-outline btn-sm">← Hub</a>
+  </nav>
+
+  <div class="container" style="margin-top: 5rem;">
+    <div class="glass-panel" style="border-top: 4px solid var(--accent-purple);">
+      <span class="badge badge-purple">VULNERABLE</span>
+      <h2 style="color: var(--accent-purple);">📂 TechCorp University — Assignment Submission</h2>
+      <p>Upload your assignment file below. <em style="color:#ef4444;">(Server accepts ANY file type!)</em></p>
+
+      <form method="POST" action="/fileupload/upload" enctype="multipart/form-data" id="uploadForm">
+        <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+          <div class="upload-icon">📁</div>
+          <p style="color:white; font-weight:600;">Drop your file here or click to browse</p>
+          <p style="font-size:0.8rem;">Any file type accepted — no validation!</p>
+          <input type="file" name="file" id="fileInput" style="display:none;" onchange="handleFile(this)">
+        </div>
+        <div id="selectedFile" style="display:none; margin-top:1rem;"></div>
+        <button type="submit" id="uploadBtn" class="btn btn-purple" style="margin-top:1rem; display:none;">📤 Upload File</button>
+      </form>
+
+      <% if (result) { %>
+        <% if (result.error) { %>
+          <div class="alert alert-danger" style="margin-top:1.5rem;">❌ <%= result.error %></div>
+        <% } else { %>
+          <div style="margin-top:1.5rem;">
+            <% if (result.isDangerous) { %>
+              <!-- SHELL EXECUTED ANIMATION -->
+              <div class="alert alert-danger" style="text-align:center; animation: glowPulse 2s infinite;">
+                <div style="font-size:2.5rem; margin-bottom:0.5rem;">💀</div>
+                <strong style="font-size:1.2rem;">SERVER COMPROMISED!</strong><br>
+                <span>Malicious file <span class="code-font"><%= result.filename %></span> uploaded and accessible!</span>
+              </div>
+
+              <div class="terminal" style="margin-top:1rem;">
+                <div class="terminal-header">
+                  <span class="terminal-dot red"></span>
+                  <span class="terminal-dot yellow"></span>
+                  <span class="terminal-dot green"></span>
+                  <span class="terminal-title">reverse_shell — root@target</span>
+                </div>
+                <div class="terminal-body" id="shellOutput">
+                  <div class="terminal-line success">[+] Webshell uploaded: <%= result.filename %></div>
+                  <div class="terminal-line success">[+] Accessible at: <%= result.path %></div>
+                  <div class="terminal-line">$ whoami</div>
+                  <div class="terminal-line success">www-data (web server user)</div>
+                  <div class="terminal-line">$ cat /etc/passwd | head -3</div>
+                  <div class="terminal-line" style="color:#ccc;">root:x:0:0:root:/root:/bin/bash</div>
+                  <div class="terminal-line" style="color:#ccc;">daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</div>
+                  <div class="terminal-line" style="color:#ccc;">bin:x:2:2:bin:/bin:/usr/sbin/nologin</div>
+                  <div class="terminal-line">$ ls /var/www/html/</div>
+                  <div class="terminal-line" style="color:#ccc;">index.html  app.js  uploads/  node_modules/</div>
+                  <div class="terminal-line warning">[!] Full server access achieved via unrestricted file upload</div>
+                </div>
+              </div>
+            <% } else { %>
+              <div class="alert alert-warning">
+                ✓ File uploaded: <span class="code-font"><%= result.filename %></span> (<%= result.size %>)
+                <br><span style="font-size:0.8rem;">This file isn't dangerous, but the server didn't check — it would accept anything!</span>
+              </div>
+            <% } %>
+
+            <div class="file-item" style="margin-top:1rem;">
+              <span class="file-icon">📄</span>
+              <span class="file-name"><%= result.filename %></span>
+              <span class="file-status code-font" style="color: <%= result.isDangerous ? 'var(--accent-red)' : 'var(--accent-green)' %>;"><%= result.ext %></span>
+            </div>
+          </div>
+        <% } %>
+      <% } %>
+
+      <div style="margin-top:2rem; padding:1rem; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid rgba(139,92,246,0.2);">
+        <h3 style="color:var(--accent-purple); font-size:1rem; margin-bottom:0.75rem;">💡 Try uploading a file named <span class="code-font" style="color:white;">shell.php</span></h3>
+        <p style="font-size:0.85rem; margin:0;">Create any text file on your computer, rename it to <span class="code-font">shell.php</span>, and upload it. The server will accept it without question — demonstrating unrestricted file upload vulnerability.</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  document.getElementById('fileInput').files = e.dataTransfer.files;
+  handleFile(document.getElementById('fileInput'));
+});
+
+function handleFile(input) {
+  if (input.files.length > 0) {
+    const f = input.files[0];
+    document.getElementById('selectedFile').style.display = 'block';
+    document.getElementById('selectedFile').innerHTML = `<div class="file-item"><span class="file-icon">📄</span><span class="file-name">${f.name} (${(f.size/1024).toFixed(1)} KB)</span></div>`;
+    document.getElementById('uploadBtn').style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>

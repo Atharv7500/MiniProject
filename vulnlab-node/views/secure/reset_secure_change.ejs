@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mission 03 | Secure Reset</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="top-nav" style="border-bottom-color: var(--accent-green);">
+    <h3 style="margin:0; color: var(--accent-green);">🟢 Secure Password Reset</h3>
+    <a href="/" class="btn btn-outline btn-sm">← Hub</a>
+  </nav>
+
+  <div class="container" style="margin-top: 5rem; max-width: 550px;">
+    <div class="glass-panel" style="border-top: 4px solid var(--accent-green);">
+      <% if (error) { %>
+        <div class="alert alert-danger" style="text-align:center;">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">🛡️</div>
+          <strong>Reset Blocked</strong><br>
+          <span><%= error %></span>
+        </div>
+        <p style="font-size:0.85rem; color:var(--accent-green);">✓ The secure system rejected this request because the token is invalid, expired, or already used. An attacker cannot manipulate the URL to reset arbitrary accounts.</p>
+        <a href="/resetexploit/secure/forgot" class="btn btn-secure">← Request New Token</a>
+
+      <% } else if (success) { %>
+        <div class="alert alert-success" style="text-align:center;">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">✅</div>
+          <strong>Password Reset Complete</strong><br>
+          <span><%= success %></span>
+        </div>
+        <p style="font-size:0.85rem; color:var(--accent-green);">The token has been invalidated. Reusing this link will now fail — one-time use enforced.</p>
+        <a href="/" class="btn btn-secure">← Back to Hub</a>
+
+      <% } else { %>
+        <span class="badge badge-green">TOKEN VERIFIED</span>
+        <h2 style="color: var(--accent-green);">Reset Password for: <span class="code-font"><%= username %></span></h2>
+
+        <div style="background:rgba(16,185,129,0.1); padding:0.75rem; border-radius:6px; margin-bottom:1.5rem; font-size:0.8rem; color:var(--accent-green); font-family:'Fira Code', monospace;">
+          Token: VALID ✓<br>
+          One-time use: ENFORCED ✓<br>
+          Expiry: CHECKED ✓
+        </div>
+
+        <form method="POST" action="/resetexploit/secure/reset">
+          <input type="hidden" name="token" value="<%= token %>">
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" name="newPassword" placeholder="Enter new password..." required style="border-color:rgba(16,185,129,0.3);">
+          </div>
+          <button type="submit" class="btn btn-secure">🔒 Reset Password Securely</button>
+        </form>
+      <% } %>
+
+      <div style="text-align:center; margin-top:2rem;">
+        <a href="/" style="color:var(--text-muted); text-decoration:none;">← Back to Hub</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

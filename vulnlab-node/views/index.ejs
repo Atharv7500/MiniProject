@@ -2,47 +2,427 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VulnLab Gamified: Access Control</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VulnLab — Cyber Operations Center</title>
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* === NEW CYBERPUNK CARD DESIGN === */
+    .new-design-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2.5rem;
+      margin-top: 3rem;
+    }
+
+    .cyber-card {
+      background: rgba(10, 15, 30, 0.85);
+      border: 1px solid rgba(0, 255, 170, 0.2);
+      border-radius: 8px;
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+    }
+
+    .cyber-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--card-color), transparent);
+      opacity: 0.8;
+    }
+
+    .idor-card {
+      --card-color: #00ffaa;
+      --card-rgb: 0, 255, 170;
+      border-top: 3px solid var(--card-color);
+    }
+
+    .admin-card {
+      --card-color: #ff2a5f;
+      --card-rgb: 255, 42, 95;
+      border-top: 3px solid var(--card-color);
+    }
+
+    .cyber-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(var(--card-rgb), 0.2);
+      border-color: var(--card-color);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      align-items: center;
+    }
+
+    .mission-badge {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      color: var(--card-color);
+      letter-spacing: 0.15em;
+      font-weight: 800;
+      text-shadow: 0 0 10px rgba(var(--card-rgb), 0.5);
+    }
+
+    .owasp-badge {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      color: #aaa;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glitch-text {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      color: #fff;
+      margin-bottom: 1rem;
+      position: relative;
+      text-shadow: 0 0 15px rgba(var(--card-rgb), 0.6);
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .desc {
+      font-size: 0.95rem;
+      color: #a0aab5;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      font-weight: 400;
+    }
+
+    .tech-stack {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tech-stack span {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.7rem;
+      padding: 0.4rem 0.8rem;
+      background: rgba(var(--card-rgb), 0.1);
+      border: 1px solid rgba(var(--card-color), 0.4);
+      color: var(--card-color);
+      border-radius: 4px;
+      box-shadow: inset 0 0 10px rgba(var(--card-rgb), 0.1);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .action-btn-group {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .cyber-btn {
+      flex: 1;
+      padding: 1rem;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-decoration: none;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Space Attack Button */
+    .attack-btn {
+      background: linear-gradient(45deg, rgba(255, 42, 95, 0.1), rgba(255, 100, 50, 0.15));
+      color: #ff2a5f;
+      border: 1px solid rgba(255, 42, 95, 0.5);
+      clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+      box-shadow: inset 0 0 15px rgba(255, 42, 95, 0.2);
+    }
+
+    .attack-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 42, 95, 0.8), transparent);
+      transform: skewX(-25deg);
+      transition: left 0.6s ease;
+      z-index: 0;
+    }
+    
+    .attack-btn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .attack-btn:hover {
+      background: rgba(255, 42, 95, 0.3);
+      box-shadow: 0 0 30px rgba(255, 42, 95, 0.6), inset 0 0 20px rgba(255, 100, 50, 0.5);
+      color: #fff;
+      text-shadow: 0 0 10px #fff;
+      border-color: #ff2a5f;
+      transform: scale(1.05);
+    }
+
+    .attack-btn:hover::before {
+      left: 200%;
+    }
+
+    /* Space Defend Button */
+    .defend-btn {
+      background: linear-gradient(45deg, rgba(0, 255, 170, 0.1), rgba(0, 150, 255, 0.15));
+      color: #00ffaa;
+      border: 1px solid rgba(0, 255, 170, 0.5);
+      clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+      box-shadow: inset 0 0 15px rgba(0, 255, 170, 0.2);
+    }
+
+    .defend-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0, 255, 170, 0.2) 4px, rgba(0, 255, 170, 0.2) 8px);
+      opacity: 0;
+      transition: opacity 0.4s;
+      z-index: 0;
+    }
+    
+    .defend-btn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .defend-btn:hover {
+      background: rgba(0, 255, 170, 0.25);
+      box-shadow: 0 0 30px rgba(0, 255, 170, 0.5), inset 0 0 20px rgba(0, 150, 255, 0.4);
+      color: #fff;
+      text-shadow: 0 0 10px #fff;
+      border-color: #00ffaa;
+      transform: scale(1.05);
+    }
+
+    .defend-btn:hover::after {
+      opacity: 1;
+    }
+
+    /* Force dark theme adjustments */
+    body { background-color: #03050a; color: #e0e0e0; }
+    .page-wrapper { z-index: 10; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="glass-panel" style="text-align: center;">
-      <h1>VulnLab: Access Control</h1>
-      <p style="font-size: 1.1rem; color: #cbd5e1;">Welcome to the Gamified Web Security Lab. Choose your simulation phase.</p>
+  <canvas id="particles-canvas"></canvas>
 
-      <div class="modes-grid">
-        <!-- Hacker Mode -->
-        <a href="/hacker/login" style="text-decoration: none;">
-          <div class="mode-card hacker">
-            <h2 style="color: var(--accent-red);">🔴 Phase 1:<br>Hacker Mode</h2>
-            <p>Attack the vulnerable infrastructure.</p>
-            <span class="badge badge-red">Goals</span>
-            <ul class="links-list" style="text-align: left; padding-left: 2rem; color: #fca5a5;">
-              <li>1. Login (user/123)</li>
-              <li>2. Escalate via Cookies</li>
-              <li>3. IDOR execution</li>
-              <li>4. Discover Secret Admin Panel</li>
-            </ul>
-          </div>
-        </a>
+  <div class="page-wrapper">
+    <div class="container wide">
+      <!-- Header -->
+      <div style="text-align:center; margin-bottom:0.5rem;">
+        <div style="font-family:'Fira Code',monospace; font-size:0.7rem; color:#2a4a3a; letter-spacing:0.3em; margin-bottom:0.75rem;">
+          &#47;&#47; CLASSIFIED // AUTHORIZED PERSONNEL ONLY
+        </div>
+        <h1 class="glitch" style="font-size:3.2rem; margin-bottom:0.5rem;">⚡ VULNLAB</h1>
+        <div style="font-family:'Orbitron',sans-serif; font-size:0.75rem; color:var(--accent-green); letter-spacing:0.2em; margin-bottom:0.5rem; text-shadow: 0 0 10px rgba(0,255,170,0.3);">
+          CYBER OPERATIONS CENTER
+        </div>
+        <p style="color:#4a6a8a; max-width:550px; margin:0 auto 2rem; font-size:0.9rem;">
+          Exploit vulnerabilities in <span style="color:var(--accent-red);">⬤ ATTACK</span> mode. Learn defenses in <span style="color:var(--accent-green);">⬤ DEFEND</span> mode.
+        </p>
+      </div>
 
-        <!-- Secure Mode -->
-        <a href="/secure/login" style="text-decoration: none;">
-          <div class="mode-card secure">
-            <h2 style="color: var(--accent-green);">🟢 Phase 2:<br>Secure Mode</h2>
-            <p>Engage with the hardened defenses.</p>
-            <span class="badge badge-green">Goals</span>
-            <ul class="links-list" style="text-align: left; padding-left: 2rem; color: #6ee7b7;">
-              <li>1. Login via JWT</li>
-              <li>2. Blocked: Role tampering</li>
-              <li>3. Blocked: IDOR extraction</li>
-              <li>4. Cryptographic Server Verification</li>
-            </ul>
+      <!-- Live Stats -->
+      <div class="hub-stats">
+        <div class="hub-stat">
+          <div class="num" id="missionCount">2</div>
+          <div class="lbl">Missions</div>
+        </div>
+        <div class="hub-stat">
+          <div class="num">2</div>
+          <div class="lbl">Simulations</div>
+        </div>
+        <div class="hub-stat">
+          <div class="num" style="color:var(--accent-red);">2</div>
+          <div class="lbl">Threat Vectors</div>
+        </div>
+      </div>
+
+      <!-- System status bar -->
+      <div style="display:flex; align-items:center; justify-content:center; gap:2rem; margin-bottom:2rem; font-family:'Fira Code',monospace; font-size:0.7rem; color:var(--text-muted); flex-wrap:wrap;">
+        <span><span class="status-dot"></span>SYSTEM ONLINE</span>
+        <span style="color:#1a2a3a;">│</span>
+        <span>NODE: <span style="color:var(--accent-cyan);">localhost:3000</span></span>
+        <span style="color:#1a2a3a;">│</span>
+        <span>STATUS: <span style="color:var(--accent-green);">OPERATIONAL</span></span>
+      </div>
+
+      <!-- Mission Cards -->
+      <div class="missions-grid new-design-grid">
+        <!-- Mission 1: IDOR -->
+        <div class="cyber-card idor-card">
+          <div class="card-header">
+            <div class="mission-badge">MODULE 01</div>
+            <div class="owasp-badge">A01:2021</div>
           </div>
-        </a>
+          <div class="card-body">
+            <h3 class="glitch-text">IDOR Vulnerability</h3>
+            <p class="desc">Manipulate direct object references in the profile endpoint to bypass authorization and extract confidential data from other users.</p>
+            <div class="tech-stack">
+              <span>Cookie Tampering</span>
+              <span>Parameter Injection</span>
+            </div>
+          </div>
+          <div class="card-actions-wrapper">
+            <div class="action-btn-group">
+              <a href="/hacker/login" class="cyber-btn attack-btn"><span>⚔ INFILTRATE</span></a>
+              <a href="/secure/login" class="cyber-btn defend-btn"><span>🛡 SECURE</span></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mission 2: Admin Panel -->
+        <div class="cyber-card admin-card">
+          <div class="card-header">
+            <div class="mission-badge">MODULE 02</div>
+            <div class="owasp-badge">A01:2021</div>
+          </div>
+          <div class="card-body">
+            <h3 class="glitch-text">Hidden Admin Panel</h3>
+            <p class="desc">Discover unlinked administrative interfaces and exploit insecure role-based access control to elevate privileges and gain full control.</p>
+            <div class="tech-stack">
+              <span>Privilege Escalation</span>
+              <span>Forced Browsing</span>
+            </div>
+          </div>
+          <div class="card-actions-wrapper">
+            <div class="action-btn-group">
+              <a href="/hacker/login" class="cyber-btn attack-btn"><span>⚔ INFILTRATE</span></a>
+              <a href="/secure/login" class="cyber-btn defend-btn"><span>🛡 SECURE</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="text-align:center; margin-top:2.5rem; font-family:'Fira Code',monospace;">
+        <p style="color:#1a2a3a; font-size:0.7rem;">
+          ═══════════════════════════════════════════════════<br>
+          <span style="color:#2a3a4a;">⚠ EDUCATIONAL USE ONLY — Never attack real systems ⚠</span><br>
+          ═══════════════════════════════════════════════════
+        </p>
       </div>
     </div>
   </div>
+
+<script>
+// === PARTICLE NETWORK BACKGROUND ===
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+const PARTICLE_COUNT = 80;
+const MAX_DIST = 150;
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = (Math.random() - 0.5) * 0.4;
+    this.r = Math.random() * 1.5 + 0.5;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,255,170,0.4)';
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+
+  // Draw connections
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < MAX_DIST) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(0,255,170,${0.08 * (1 - d / MAX_DIST)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animate);
+}
+animate();
+
+// === HOLOGRAPHIC CARD MOUSE TRACKING ===
+function trackMouse(e, card) {
+  const rect = card.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width) * 100;
+  const y = ((e.clientY - rect.top) / rect.height) * 100;
+  card.style.setProperty('--mouse-x', x + '%');
+  card.style.setProperty('--mouse-y', y + '%');
+}
+function resetMouse(card) {
+  card.style.setProperty('--mouse-x', '50%');
+  card.style.setProperty('--mouse-y', '0%');
+}
+
+// === ANIMATED COUNTER ===
+function animateCount(el, target, dur) {
+  let start = 0;
+  const step = () => {
+    start += target / (dur / 16);
+    if (start >= target) { el.textContent = target; return; }
+    el.textContent = Math.floor(start);
+    requestAnimationFrame(step);
+  };
+  step();
+}
+document.querySelectorAll('.hub-stat .num').forEach(el => {
+  const val = parseInt(el.textContent);
+  if (!isNaN(val)) animateCount(el, val, 1000);
+});
+</script>
 </body>
 </html>
